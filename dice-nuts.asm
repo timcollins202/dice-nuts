@@ -45,7 +45,7 @@ INES_SRAM   = 0 ; 1 = battery backed SRAM at $6000-7FFF
     temp:               .res 10     ;General purpose temp space
     dice_values:        .res 6      ;Numbers on the dice faces
     dice_selected:      .res 6      ;Each byte non-zero if that die is selected
-    dice_timer:         .res 6      ;Dice rolling animation timer
+    dice_timers:        .res 6      ;Dice rolling animation timers
     gamestate:          .res 1      ;0-title/intro screen 1-selecting dice 1-scoring dice 3-game over
     pointed_to_die:     .res 1      ;stores which die the selector is on
     draw_die_number:    .res 1      ;number that draw_die needs to put on the die
@@ -122,6 +122,7 @@ titleloop:
 mainloop:
     ;loop calls go here - player_actions, etc.
     JSR player_actions
+    JSR animate_dice
 
     JMP mainloop
 .endproc

@@ -1,5 +1,5 @@
 ;*****************************************************************
-; increment_dice_roll:  Increments dice_roll during vblank, 
+; increment_dice_roll:  Increments dice_roll during vblank,
 ;   keeping it between 1 and 6
 ;*****************************************************************
 .proc increment_dice_roll
@@ -23,7 +23,7 @@
     ;store whatever's in dice_roll to dice_values[pointed_to_die]
     LDX pointed_to_die
     LDA dice_roll
-    STA dice_values, x 
+    STA dice_values, x
 
     STA draw_die_number
 
@@ -31,11 +31,15 @@
     LDA PPU_STATUS
     LDA #$20
     STA paddr + 1
-    LDA dice_starting_adresses_lo, x 
+    LDA dice_starting_adresses_lo, x
     STA paddr
 
+    ;set animation timer for the rolled die
+    LDA #10
+    STA dice_timers, x
+
     ;set needdraw_die to 1 for NMI to pick up
-    LDA #1
-    STA needdraw_die
+    ; LDA #1
+    ; STA needdraw_die
     RTS
 .endproc

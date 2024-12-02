@@ -137,7 +137,6 @@ not_pressing_a:
 .endproc
 
 .proc move_selector_up
-    ;figure out the bottorm row pixel positions first
     SEC
     SBC #32
     STA SELECTOR_1_YPOS

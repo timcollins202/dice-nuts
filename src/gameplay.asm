@@ -17,7 +17,7 @@
 .endproc
 
 ;*****************************************************************
-; Get a value from dice_rolls and draw that number on the selected die
+; Get a value from dice_roll and draw that number on the selected die
 ;*****************************************************************
 .proc roll_die
     ;store whatever's in dice_roll to dice_values[pointed_to_die]

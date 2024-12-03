@@ -334,28 +334,46 @@ loop:
     LDA dice_timers, y 
     CMP #0                  ;if timer = 0, die is not animating
     BEQ skip
-    ;animate the die here
-        LDA dice_roll       ;get whatever is in dice_roll
-        STA draw_die_number
 
-        ;set starting address for draw_die
-        LDA PPU_STATUS
-        LDA #$20
-        STA paddr + 1
-        LDA dice_starting_adresses_lo, y
-        STA paddr
+    ;Use delay counters to progressively slow animation
+    LDA dice_delay, y
+    BEQ animate             ;only animate when delay counter reaches 0
 
-        ;decrement animation timer
-        LDA dice_timers, y
-        BEQ :+
-            SEC  ;don't let it go below 0
-            SBC #1
-            STA dice_timers, y
-        :
-        LDA #1
-        STA needdraw_die
-        
-        JSR wait_frame
+    ;decrement the delay counter
+    SEC
+    SBC #1
+    STA dice_delay, y
+    JSR wait_frame
+    JMP skip
+
+animate:
+    ;set the delay 
+    LDA #6
+    STA dice_delay, y 
+
+    ;animate the die
+    LDA dice_roll       ;get whatever is in dice_roll
+    STA draw_die_number
+
+    ;set starting address for draw_die
+    LDA PPU_STATUS
+    LDA #$20
+    STA paddr + 1
+    LDA dice_starting_adresses_lo, y
+    STA paddr
+
+    ;decrement animation timer
+    LDA dice_timers, y
+    BEQ :+
+        SEC  ;don't let it go below 0
+        SBC #1
+        STA dice_timers, y
+    :
+
+    LDA #1
+    STA needdraw_die
+    
+    JSR wait_frame
 skip:
     INY
     CPY #6

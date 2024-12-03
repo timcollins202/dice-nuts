@@ -2,17 +2,15 @@
 ; increment_dice_roll:  Increments dice_roll during vblank,
 ;   keeping it between 1 and 6
 ;*****************************************************************
-.proc increment_dice_roll
-    LDY dice_roll
-    CPY #6
-    BNE :+
-        LDA #1
-        STA dice_roll
-        RTS
+.proc increment_dice_roll   
+    LDA dice_roll
+    CLC              ; Clear carry for addition
+    ADC #1           ; Increment
+    CMP #7           ; Check if it exceeds 6
+    BCC :+           ; If less than 7, skip reset
+    LDA #1           ; Reset to 1
     :
-    INY
-    STY dice_roll
-
+    STA dice_roll
     RTS
 .endproc
 
@@ -35,7 +33,7 @@
     STA paddr
 
     ;set animation timer for the rolled die
-    LDA #10
+    LDA #6
     STA dice_timers, x
 
     ;set needdraw_die to 1 for NMI to pick up

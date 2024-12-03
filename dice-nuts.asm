@@ -46,6 +46,7 @@ INES_SRAM   = 0 ; 1 = battery backed SRAM at $6000-7FFF
     dice_values:        .res 6      ;Numbers on the dice faces
     dice_selected:      .res 6      ;Each byte non-zero if that die is selected
     dice_timers:        .res 6      ;Dice rolling animation timers
+    dice_delay:         .res 6      ;Dice animation frame delay counters
     gamestate:          .res 1      ;0-title/intro screen 1-selecting dice 1-scoring dice 3-game over
     pointed_to_die:     .res 1      ;stores which die the selector is on
     draw_die_number:    .res 1      ;number that draw_die needs to put on the die

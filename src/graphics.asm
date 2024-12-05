@@ -93,8 +93,6 @@ loop3:
     RTS
 .endproc
 
-
-
 ;*****************************************************************
 ; draw_bg_filler_row  -- Draws a row of background filler tiles
 ;   Inputs: Set VRAM address before calling this subroutine
@@ -274,7 +272,7 @@ loop:
 
 
 ;*****************************************************************
-; draw_die  -- Draws a die to screen
+; draw_die  -- Draws a die to screen during vblank
 ;   Inputs: paddr = VRAM address pointer
 ;           Y = number to put on die
 ;*****************************************************************
@@ -320,7 +318,6 @@ done:
     STA needdraw_die
     STA draw_die_number
     RTS
-
 .endproc
 
 
@@ -335,7 +332,6 @@ loop:
     CMP #0                  ;if timer = 0, die is not animating
     BEQ skip
 
-    ;Use delay counters to progressively slow animation
     LDA dice_delay, y
     BEQ animate             ;only animate when delay counter reaches 0
 
@@ -348,11 +344,11 @@ loop:
 
 animate:
     ;set the delay 
-    LDA #6
+    LDA #6                  ;6 frame delay
     STA dice_delay, y 
 
     ;animate the die
-    LDA dice_roll       ;get whatever is in dice_roll
+    LDA dice_roll           ;get whatever is in dice_roll
     STA draw_die_number
 
     ;set starting address for draw_die
@@ -380,3 +376,5 @@ skip:
     BNE loop
     RTS
 .endproc
+
+

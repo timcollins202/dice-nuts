@@ -35,9 +35,5 @@
     ;set animation timer for the rolled die
     LDA #6
     STA dice_timers, x
-
-    ;set needdraw_die to 1 for NMI to pick up
-    ; LDA #1
-    ; STA needdraw_die
     RTS
 .endproc

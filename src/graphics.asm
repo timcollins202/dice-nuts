@@ -40,9 +40,9 @@ loop:
 ;*****************************************************************
 .segment "CODE"
 roll_text_1:
-    .byte "ROLL ALL SIX DICE",0
+    .byte "ROLL ALL SIX DICE", 0
 roll_text_2:
-    .byte "BY PRESSING A",0
+    .byte "BY PRESSING A", $2f, 0
 
 .proc draw_game_screen
     JSR ppu_off

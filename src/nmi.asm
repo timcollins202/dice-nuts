@@ -16,13 +16,13 @@
     STA SPRITE_DMA
 
     ;do we need to update vram?
-    LDA needupdate
+    LDA need_horiz_update
     BEQ :+
         JSR read_vram_buffer_horiz_run
     :
 
     ;do we need to draw a die?
-    LDA needdraw_die
+    LDA need_draw_die
     BEQ :+
         JSR draw_die
     :

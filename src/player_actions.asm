@@ -60,14 +60,11 @@ not_pressing_up:
     LDA gamepad
     AND #PAD_A
     BEQ not_pressing_a
-        ;we are pressing A.  See if we are pre-roll
-        LDA gamestate
+        ;we are pressing A.  See if we are rolling dice
+        LDA gamestate ;gamestate 1 = rolling dice
         CMP #1
         BNE not_pressing_a
-            ;we are pressing start pre-roll.  Roll em!
-            ;update gamestate
-            ; LDA #1                  ;gamestate 1 = rolling dice
-            ; STA gamestate
+            ;we are pressing A.  Roll em!            
             JSR roll_die
 
             

@@ -38,8 +38,8 @@ INES_SRAM   = 0 ; 1 = battery backed SRAM at $6000-7FFF
 ; Reserve memory for variables
 ;*****************************************************************
 .segment "ZEROPAGE"
-    needupdate:         .res 1      ;non-zero if we need to update VRAM during vblank
-    needdraw_die:       .res 1      ;non-zero if we need to draw a die to screen
+    need_horiz_update:  .res 1      ;non-zero if we need to update VRAM during vblank
+    need_draw_die:      .res 1      ;non-zero if we need to draw a die to screen
     paddr:              .res 2      ;16-bit address pointer
     dice_roll:          .res 1      ;Stores an auto-incrementing value 1-6 for dice to grab
     temp:               .res 10     ;General purpose temp space
@@ -47,6 +47,7 @@ INES_SRAM   = 0 ; 1 = battery backed SRAM at $6000-7FFF
     dice_selected:      .res 6      ;Each byte non-zero if that die is selected
     dice_timers:        .res 6      ;Dice rolling animation timers
     dice_delay:         .res 6      ;Dice animation frame delay counters
+    kept_dice:          .res 6      ;Dice that have been kept for scoring
     gamestate:          .res 1      ;0-title/intro screen 1-rolling dice 2-selecting dice 3-scoring dice 4-game over
     pointed_to_die:     .res 1      ;stores which die the selector is on
     draw_die_number:    .res 1      ;number that draw_die needs to put on the die
@@ -123,6 +124,7 @@ titleloop:
 mainloop:
     JSR player_actions
     JSR animate_dice
+    JSR set_gamestate
 
     JMP mainloop
 .endproc

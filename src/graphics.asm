@@ -238,7 +238,7 @@ lower_line:
 vram_data:
     .byte 14, $20, $A6, "YOU PRESSED A"
 
-.proc populate_vram_buffer
+.proc load_vram_text_buffer
     LDX #0
 loop:
     LDA vram_data, x 
@@ -274,7 +274,7 @@ loop:
 ;*****************************************************************
 ; draw_die  -- Draws a die to screen during vblank
 ;   Inputs: paddr = VRAM address pointer
-;           Y = number to put on die
+;           Y = number to put on die                    NMI
 ;*****************************************************************
 .proc draw_die
     ; Load the starting index from dice_tile_offsets based on the value in Y
@@ -315,18 +315,18 @@ small_loop:
 done:
     ;set needdraw_die and draw_die_number back to 0
     LDA #0
-    STA needdraw_die
+    STA need_draw_die
     STA draw_die_number
     RTS
 .endproc
 
 
 ;*****************************************************************
-; Animate dice when they are rolled
+; Animate dice when they are rolled                     MAIN
 ;*****************************************************************
 .proc animate_dice
     ;loop over dice and see if any need to animate
-    LDY #0                  ;iterator
+    LDY #0                  ;iterators
 loop:
     LDA dice_timers, y 
     CMP #0                  ;if timer = 0, die is not animating
@@ -367,7 +367,7 @@ animate:
     :
 
     LDA #1
-    STA needdraw_die
+    STA need_draw_die
     
     JSR wait_frame
 skip:

@@ -1,6 +1,7 @@
 ;*****************************************************************
 ; Draw the title screen
 ;*****************************************************************
+.segment "CODE"
 title_text:
     .byte "PRESS A TO UPDATE VRAM",0
 
@@ -38,6 +39,11 @@ loop:
 ; Draw Main Game Screen
 ;*****************************************************************
 .segment "CODE"
+roll_text_1:
+    .byte "ROLL ALL SIX DICE",0
+roll_text_2:
+    .byte "BY PRESSING A",0
+
 .proc draw_game_screen
     JSR ppu_off
     JSR clear_nametable
@@ -87,6 +93,14 @@ loop3:
     INY
     CPY #64
     BNE loop3
+
+    vram_set_address $21e3 
+    assign_16i text_address, roll_text_1
+    JSR write_text
+
+    vram_set_address $2203 
+    assign_16i text_address, roll_text_2
+    JSR write_text
 
     JSR ppu_update  ;wait til screen has been drawn
     

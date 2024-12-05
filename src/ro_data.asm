@@ -57,4 +57,4 @@ dice_starting_adresses_lo:
     .byte $63, $68, $6D, $E3, $E8, $ED
 
 dice_tile_offsets:
-    .byte 0, 16, 32, 48, 64, 80  ; Offsets for dice numbers 1-6
+    .byte 0, 16, 32, 48, 64, 80

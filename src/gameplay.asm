@@ -79,8 +79,7 @@ reset:
 ;*****************************************************************
 .proc select_die
     ;get the value on the selected die and store it to temp
-    LDA pointed_to_die
-    TAX
+    LDX pointed_to_die
     LDA dice_values, x 
     STA temp
 
@@ -95,8 +94,8 @@ loop:
     LDA temp
     STA kept_dice, y 
 
-    ; Set starting address for draw_die
-    LDA PPU_STATUS       ; Reset PPU status (required before VRAM updates)
+    ;set starting address for draw_die
+    LDA PPU_STATUS
     LDA #$20
     STA paddr + 1
     LDA dice_starting_adresses_lo, x
@@ -107,5 +106,6 @@ loop:
     STA draw_die_number
     LDA #1
     STA need_draw_die
+    ;TODO - draw the selected die in the text box here
     RTS
 .endproc

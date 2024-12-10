@@ -40,9 +40,11 @@ loop:
 ;*****************************************************************
 .segment "CODE"
 roll_text_1:
-    .byte "ROLL ALL SIX DICE", 0
+    .byte "POINT TO A DIE AND PRESS", 0
 roll_text_2:
-    .byte "BY PRESSING A", $2f, 0
+    .byte "A TO ROLL IT", 0
+roll_text_3:
+    .byte "ROLL ALL SIX", $2f, 0
 
 .proc draw_game_screen
     JSR ppu_off
@@ -100,6 +102,10 @@ loop3:
 
     vram_set_address $2203 
     assign_16i text_address, roll_text_2
+    JSR write_text
+
+    vram_set_address $2223 
+    assign_16i text_address, roll_text_3
     JSR write_text
 
     JSR ppu_update  ;wait til screen has been drawn
@@ -241,7 +247,6 @@ lower_line:
 
     RTS
 .endproc
-
 
 
 ;*****************************************************************

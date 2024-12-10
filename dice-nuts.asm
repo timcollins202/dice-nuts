@@ -44,7 +44,7 @@ INES_SRAM   = 0 ; 1 = battery backed SRAM at $6000-7FFF
     dice_roll:          .res 1      ;Stores an auto-incrementing value 1-6 for dice to grab
     temp:               .res 10     ;General purpose temp space
     dice_values:        .res 6      ;Numbers on the dice faces
-    dice_selected:      .res 6      ;Each byte non-zero if that die is selected
+    dice_kept:          .res 6      ;Each byte non-zero if that die is selected
     dice_timers:        .res 6      ;Dice rolling animation timers
     dice_delay:         .res 6      ;Dice animation frame delay counters
     kept_dice:          .res 6      ;Dice that have been kept for scoring

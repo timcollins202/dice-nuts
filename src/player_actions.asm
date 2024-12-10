@@ -63,11 +63,14 @@ not_pressing_up:
         ;we are pressing A.  See if we are rolling dice
         LDA gamestate ;gamestate 1 = rolling dice
         CMP #1
-        BNE not_pressing_a
+        BNE :+
             ;we are pressing A.  Roll em!            
             JSR roll_die
-
-            
+        ;next, check for gamestate=2 and select dice
+        :
+        CMP #2
+        BNE not_pressing_a
+            JSR select_die
 not_pressing_a:
 
     RTS

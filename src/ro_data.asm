@@ -59,3 +59,8 @@ dice_starting_adresses_lo:
 
 dice_tile_offsets:
     .byte 0,16,32,48,64,80,96
+
+text_box_addresses_hi:
+	.byte $21,$22,$22,$22,$22,$22,$22,$22,$22,$23,$23,$23
+text_box_addresses_lo:
+	.byte $e3,$03,$23,$43,$63,$83,$a3,$c3,$e3,$03,$23,$43

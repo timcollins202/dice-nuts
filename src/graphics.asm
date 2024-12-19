@@ -270,22 +270,60 @@ loop:
 
 .proc read_vram_buffer_horiz_run
     LDX #0
-    LDY vram_buffer, x    ;load number of bytes to write into Y
+    LDY vram_buffer, x    ; Load number of bytes to write into Y
     INX
     LDA PPU_STATUS
-    LDA vram_buffer, x    ;load the hi byte of the starting address
+    LDA vram_buffer, x    ; Load the hi byte of the starting address
     STA PPU_ADDR
     INX
-    LDA vram_buffer, x    ;load low byte of starting address
+    LDA vram_buffer, x    ; Load the lo byte of the starting address
     STA PPU_ADDR
     INX
 loop:
-    LDA vram_buffer, x      ;Y is iterator
-    STA PPU_DATA
+    LDA vram_buffer, x    ; Load a byte from the buffer
+    STA PPU_DATA          ; Write it to VRAM
+    LDA #0                ; Clear the buffer byte as it is written
+    STA vram_buffer, x
     INX
     DEY
     CPY #0
     BNE loop
+
+    ; Clear the number of bytes to write (first byte in buffer)
+    LDA #0
+    STA vram_buffer
+    RTS
+.endproc
+
+
+;*****************************************************************
+; Clear a line of textbox space                 MAIN
+;   Input: temp + 3 holds what number line you want cleared 
+;*****************************************************************
+.proc clear_textbox_line
+    LDX temp + 3        ;load index from temp + 3
+
+    ; Set number of bytes to write and starting address from lookup table
+    LDA #25             ;we will write 25 bytes to VRAM buffer
+    STA vram_buffer
+    LDA text_box_addresses_hi, x 
+    STA vram_buffer + 1    ;write starting VRAM address hi byte
+    LDA text_box_addresses_lo, x 
+    STA vram_buffer + 2    ;write starting VRAM address lo byte
+
+    ; Store 0 tile to VRAM 25 times to clear a row
+    LDY #0                  ;iterator
+loop:
+    LDA #$00                ;empty space tile
+    STA vram_buffer + 3, y 
+    INY
+    CPY #25
+    BNE loop
+
+    ;Set update flag for NMI
+    LDA #1
+    STA need_horiz_update
+
     RTS
 .endproc
 

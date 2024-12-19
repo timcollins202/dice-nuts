@@ -19,7 +19,23 @@ check_values:
     ; All dice have rolled, update gamestate to 2 = selecting dice
     LDA #2
     STA gamestate
-    ;TODO - update textbox to explain selecting dice
+
+    ; Clear 3 lines of the text box, one per frame
+    LDY #0              ; Initialize iterator
+line_loop:
+    STY temp + 2
+    STY temp + 3        ; Set line number to clear
+    JSR clear_textbox_line
+    LDY temp + 2
+    JSR wait_frame
+
+    ;Clear the update flag for the next iteration
+    LDA #0
+    STA need_horiz_update
+
+    INY
+    CPY #3              ; Compare Y with 3 (number of lines)
+    BNE line_loop       ; Continue if more lines to clear
 
 done:
     RTS

@@ -386,7 +386,9 @@ done:
     LDY #0                  ;iterators
 loop:
     LDA dice_timers, y 
-    CMP #0                  ;if timer = 0, die is not animating
+
+    ;if timer = 0, die is not animating
+    CMP #0
     BEQ skip
 
     LDA dice_delay, y
@@ -405,9 +407,18 @@ animate:
     STA dice_delay, y 
 
     ;animate the die
+    ;on last frame, get value from dice_values
+    LDA dice_timers, y 
+    CMP #1
+    BNE not_last_frame
+        LDA dice_values, y
+        STA draw_die_number
+        JMP set_address
+not_last_frame:
     LDA dice_roll           ;get whatever is in dice_roll
     STA draw_die_number
 
+set_address:
     ;set starting address for draw_die
     LDA PPU_STATUS
     LDA #$20

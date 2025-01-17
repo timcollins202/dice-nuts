@@ -10,7 +10,7 @@
     LDY #0              ; Initialize iterator for dice_values
 check_values:
     LDA dice_values, y  ; Load value for die `y`
-    CMP #0              ; Check if die value is still 0
+    CMP #$ff            ; Check if die value is still $ff
     BEQ done            ; If any die value is 0, stay in current gamestate
     INY
     CPY #6              ; Check all 6 dice (0 to 5)
@@ -32,7 +32,6 @@ line_loop:
     ;Clear the update flag for the next iteration
     LDA #0
     STA need_horiz_update
-
     INY
     CPY #3              ; Compare Y with 3 (number of lines)
     BNE line_loop       ; Continue if more lines to clear
@@ -43,27 +42,34 @@ done:
 
 
 ;*****************************************************************
-; Increments dice_roll during vblank, keeping it between 1 and 6
+; Increments dice_roll during vblank, keeping it between 0 and 5
 ;*****************************************************************
 .proc increment_dice_roll
-    LDY dice_roll
-    CPY #6
-    BNE :+
-        LDA #1             ; Reset to 1 after 6
-        STA dice_roll
-        RTS
-    :
-    INY
-    CPY #6                 ; Prevent incrementing to the "X" face
-    BEQ reset
-    STY dice_roll
+    LDA dice_roll
+    CMP #5
+    BEQ reset             ; If dice_roll is 5, reset to 0
+    INC dice_roll         ; Otherwise, increment it
     RTS
 reset:
-    LDA #1
+    LDA #0
     STA dice_roll
     RTS
 .endproc
 
+
+;*****************************************************************
+; Initialize dice to $ff, denoting them as unrolled
+;*****************************************************************
+.proc initialize_dice
+    LDY #0                  ;iterator
+loop:
+    LDA #$ff
+    STA dice_values, y 
+    INY
+    CPY #6
+    BNE loop
+    RTS
+.endproc
 
 ;*****************************************************************
 ; Get a value from dice_roll and draw that number on the selected die

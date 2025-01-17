@@ -424,8 +424,7 @@ animate:
     :
 
     LDA #1
-    STA need_draw_die
-    
+    STA need_draw_die    
     JSR wait_frame
 skip:
     INY
@@ -433,5 +432,3 @@ skip:
     BNE loop
     RTS
 .endproc
-
-

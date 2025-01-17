@@ -119,12 +119,14 @@ titleloop:
     STA gamestate
     
     JSR draw_game_screen
+    JSR initialize_dice
     JSR draw_selector
 
 mainloop:
     JSR player_actions
     JSR animate_dice
     JSR set_gamestate
+    ;JSR draw_kept_dice
 
     JMP mainloop
 .endproc

@@ -55,12 +55,15 @@ playfield_attr:
 	.byte $11,$00,$00,$00,$00,$00,$00,$44,$05,$05,$05,$05,$05,$05,$05,$05
 
 dice_starting_adresses_lo:
-    .byte $63,$68,$6D,$E3,$E8,$ED
+    .byte $63,$68,$6d,$e3,$e8,$ed
 
 dice_tile_offsets:
     .byte 0,16,32,48,64,80,96
 
-text_box_addresses_hi:
+text_box_line_start_addresses_hi:
 	.byte $21,$22,$22,$22,$22,$22,$22,$22,$22,$23,$23,$23
-text_box_addresses_lo:
+text_box_line_start_addresses_lo:
 	.byte $e3,$03,$23,$43,$63,$83,$a3,$c3,$e3,$03,$23,$43
+
+text_box_die_start_addresses_lo:
+	.byte $e3,$e7,$eb,$ef,$f3,$f7

@@ -306,9 +306,9 @@ loop:
     ; Set number of bytes to write and starting address from lookup table
     LDA #25             ;we will write 25 bytes to VRAM buffer
     STA vram_buffer
-    LDA text_box_addresses_hi, x 
+    LDA text_box_line_start_addresses_hi, x 
     STA vram_buffer + 1    ;write starting VRAM address hi byte
-    LDA text_box_addresses_lo, x 
+    LDA text_box_line_start_addresses_lo, x 
     STA vram_buffer + 2    ;write starting VRAM address lo byte
 
     ; Store 0 tile to VRAM 25 times to clear a row

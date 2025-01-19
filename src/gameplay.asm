@@ -11,7 +11,7 @@
 check_values:
     LDA dice_values, y  ; Load value for die `y`
     CMP #$ff            ; Check if die value is still $ff
-    BEQ done            ; If any die value is 0, stay in current gamestate
+    BEQ done            ; If any die value is $ff, stay in current gamestate
     INY
     CPY #6              ; Check all 6 dice (0 to 5)
     BNE check_values    ; Continue checking if not done
@@ -23,8 +23,8 @@ check_values:
     ; Clear 3 lines of the text box, one per frame
     LDY #0              ; Initialize iterator
 line_loop:
-    STY temp + 2
-    STY temp + 3        ; Set line number to clear
+    STY temp + 2        ; stash Y in temp + 2 to retrieve after clear_textbox_line
+    STY temp + 3        ; set line number to clear
     JSR clear_textbox_line
     LDY temp + 2
     JSR wait_frame
@@ -117,17 +117,32 @@ loop:
     STA kept_dice, y 
 
     ;set starting address for draw_die
-    LDA PPU_STATUS
     LDA #$20
     STA paddr + 1
     LDA dice_starting_adresses_lo, x
     STA paddr
 
     ;draw an X on the die we selected
-    LDA #6               ;7 is the index for the X'ed out die
+    LDA #6               ;6 is the index for the X'ed out die
     STA draw_die_number
     LDA #1
     STA need_draw_die
-    ;TODO - draw the selected die in the text box here
+    JSR wait_frame
+    
+    ;draw the die in the text box
+    ; Y still contains the index of kept_dice we're working with,
+    ; use that to figure out starting address for draw_die
+    LDA kept_dice, y 
+    STA draw_die_number
+    LDA #$21
+    STA paddr +1
+    TYA
+    TAX
+    LDA text_box_die_start_addresses_lo, x 
+    STA paddr
+
+    LDA #1
+    STA need_draw_die
+    
     RTS
 .endproc

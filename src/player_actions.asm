@@ -71,7 +71,20 @@ not_pressing_up:
         CMP #2
         BNE not_pressing_a
             JSR select_die
+
 not_pressing_a:
+    LDA gamepad
+    AND #PAD_B
+    BEQ not_pressing_b
+        ;we are pressing B.  See if we are selecting dice
+        LDA gamestate       ;gamestate 2 = selecting dice
+        CMP #2
+        BNE not_pressing_b
+            LDA #3
+            STA gamestate   ;gamestate 3 = scoring dice
+            ;JSR score_dice
+
+not_pressing_b:
 
     RTS
 .endproc

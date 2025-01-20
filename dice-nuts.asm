@@ -51,6 +51,7 @@ INES_SRAM   = 0 ; 1 = battery backed SRAM at $6000-7FFF
     gamestate:          .res 1      ;0-title/intro screen 1-rolling dice 2-selecting dice 3-scoring dice 4-game over
     pointed_to_die:     .res 1      ;stores which die the selector is on
     draw_die_number:    .res 1      ;number that draw_die needs to put on the die
+    score:              .res 4      ;the player's score, one byte per decimal digit
 
 .segment "OAM"
     oam:                .res 256    ;OAM sprite data
@@ -103,10 +104,6 @@ paletteloop:
     LDA #BG_ON|OBJ_ON
     STA ppu_ctl1
 
-    ;initialize gamestate to 0
-    LDA #0
-    STA gamestate
-
     JSR draw_title_screen
 
 titleloop:
@@ -126,7 +123,6 @@ mainloop:
     JSR player_actions
     JSR animate_dice
     JSR set_gamestate
-    ;JSR draw_kept_dice
 
     JMP mainloop
 .endproc

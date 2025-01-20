@@ -1,3 +1,5 @@
+.segment "CODE"
+
 ;*****************************************************************
 ; Set gamestate
 ;*****************************************************************
@@ -35,9 +37,10 @@ line_loop:
     INY
     CPY #3              ; Compare Y with 3 (number of lines)
     BNE line_loop       ; Continue if more lines to clear
+
     ; player will press B to finish selecting dice. 
-    ; this is handled in player_actions.
-   
+    ; gamestate is set to 3 in player_actions.
+    
 done:
     RTS
 .endproc

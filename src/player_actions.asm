@@ -1,3 +1,5 @@
+.segment "CODE"
+
 ;*****************************************************************
 ; Handle player actions
 ;*****************************************************************
@@ -30,7 +32,6 @@ not_pressing_right:
             ;we are not on left edge.  Move selector the next die to the left
             JSR move_selector_left
             JSR set_pointed_to_die
-
 
 not_pressing_left:
     LDA gamepad
@@ -82,7 +83,7 @@ not_pressing_a:
         BNE not_pressing_b
             LDA #3
             STA gamestate   ;gamestate 3 = scoring dice
-            ;JSR score_dice
+            JSR score_dice
 
 not_pressing_b:
 

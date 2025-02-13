@@ -147,7 +147,54 @@ loop:
     STA paddr
 
     LDA #1
-    STA need_draw_die
+    STA need_draw_die    
+    RTS
+.endproc
+
+
+;*****************************************************************
+; Score selected dice
+;*****************************************************************
+.proc score_dice
+
+
+.endproc
+
+
+;*****************************************************************
+; Add the value in A to the score
+;*****************************************************************
+.proc add_score
+    CLC
+    ADC score           ; See Cruise, p.162
+    STA score
+    CMP #99
+    BCC skip
+
+    SEC                 ; The first byte has exceeded 99, so overflow
+    SBC #100
+    STA score
+    INC score + 1
+    LDA score + 1
+    CMP #99
+    BCC skip
+
+    SEC                 ; The 2nd byte has exceeded 99, so overflow
+    SBC #100
+    STA score + 1
+    INC score + 2
+    LDA score + 2
+    CMP #99
+    BCC skip
+    SEC                 ; If the 3rd byte exceeds 99, adjust and discard the overflow
+    SBC #100
+    STA score + 2
+
+skip:
+    ; load score bytes into vram buffer
     
+
+    LDA #1               ;set flag to update score on screen
+    STA need_horiz_update
     RTS
 .endproc

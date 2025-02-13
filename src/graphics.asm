@@ -1,7 +1,7 @@
+.segment "CODE"
 ;*****************************************************************
 ; Draw the title screen
 ;*****************************************************************
-.segment "CODE"
 title_text:
     .byte "PRESS A TO UPDATE VRAM",0
 
@@ -38,7 +38,6 @@ loop:
 ;*****************************************************************
 ; Draw Main Game Screen
 ;*****************************************************************
-.segment "CODE"
 roll_text_1:
     .byte "POINT TO A DIE AND PRESS", 0
 roll_text_2:
@@ -117,7 +116,6 @@ loop3:
 ; draw_bg_filler_row  -- Draws a row of background filler tiles
 ;   Inputs: Set VRAM address before calling this subroutine
 ;*****************************************************************
-.segment "CODE"
 .proc draw_bg_filler_row    
     LDA #$04        ;background filler tile
     LDY #0          ;iterator
@@ -134,7 +132,6 @@ loop:
 ; draw_lower_text_box  -- Draws the empty lower text box
 ;   Inputs: Set VRAM address before calling this subroutine
 ;*****************************************************************
-.segment "CODE"
 .proc draw_lower_text_box
     LDX #0          ;big iterator
     LDY #0          ;small iterator
@@ -208,7 +205,6 @@ lower_line:
 ;*****************************************************************
 ; Put player's selector sprite on screen
 ;*****************************************************************
-.segment "CODE"
 .proc draw_selector
     ;initialize pointed_to_die to 0
     LDA #0

@@ -1,4 +1,3 @@
-@echo off
 @del output\dice-nuts.o
 @del output\dice-nuts.nes
 @del output\dice-nuts.map.txt
@@ -15,19 +14,9 @@
 @echo Linking...
 \cc65\bin\ld65 -o output\dice-nuts.nes -C dice-nuts.cfg output\dice-nuts.o -m output\dice-nuts.map.txt -Ln output\dice-nuts.labels.txt --dbgfile output\dice-nuts.nes.dbg
 @IF ERRORLEVEL 1 GOTO failure
-
-:: Generate a timestamp (YYYYMMDD_HHMMSS)
-for /f "tokens=2 delims==" %%I in ('"wmic os get localdatetime /value"') do set dt=%%I
-set timestamp=%dt:~0,8%_%dt:~8,6%
-
-:: Rename output file with timestamp
-set output_file=dice-nuts_%timestamp%.nes
-rename output\dice-nuts.nes %output_file%
-
 @echo.
-@echo Success! Output saved as %output_file%
+@echo Success!
 @GOTO endbuild
-
 :failure
 @echo.
 @echo Build error!

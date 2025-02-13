@@ -76,7 +76,7 @@ nmi_ready:		.res 1 ; set to 1 to push a PPU frame update,
 ppu_ctl0:		.res 1 ; PPU Control Register 2 Value
 ppu_ctl1:		.res 1 ; PPU Control Register 2 Value
 
-.include "macros.s"
+.include "lib/macros.asm"
 
 ;*****************************************************************
 ; wait_frame: waits until the next NMI occurs

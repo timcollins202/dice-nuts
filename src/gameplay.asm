@@ -82,6 +82,9 @@ loop:
 .proc roll_die
     ;store whatever's in dice_roll to dice_values[pointed_to_die]
     LDX pointed_to_die
+    LDA dice_values, x
+    CMP #$ff                ;make sure the die has not been rolled yet
+    BNE skip
     LDA dice_roll
     STA dice_values, x
 
@@ -97,6 +100,7 @@ loop:
     ;set animation timer for the rolled die
     LDA #6
     STA dice_timers, x
+skip:
     RTS
 .endproc
 

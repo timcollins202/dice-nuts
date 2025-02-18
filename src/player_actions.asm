@@ -65,10 +65,9 @@ not_pressing_up:
         LDA gamestate ;gamestate 1 = rolling dice
         CMP #1
         BNE :+
-            ;we are pressing A.  Roll em!            
             JSR roll_die
-        ;next, check for gamestate=2 and select dice
         :
+        ;next, check for gamestate=2 and select dice
         CMP #2
         BNE not_pressing_a
             JSR select_die
@@ -77,15 +76,21 @@ not_pressing_a:
     LDA gamepad
     AND #PAD_B
     BEQ not_pressing_b
-        ;we are pressing B.  See if we are selecting dice
+        ;we are pressing B. Nothing to do here yet.
+        
+not_pressing_b:
+    LDA gamepad
+    AND #PAD_START
+    BEQ not_pressing_start
+        ;we are pressing Start.  See if we are selecting dice
         LDA gamestate       ;gamestate 2 = selecting dice
         CMP #2
-        BNE not_pressing_b
+        BNE not_pressing_start
             LDA #3
             STA gamestate   ;gamestate 3 = scoring dice
-            JSR score_dice
+            ;JSR score_dice
 
-not_pressing_b:
+not_pressing_start:
 
     RTS
 .endproc

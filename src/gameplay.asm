@@ -70,6 +70,7 @@ reset:
 loop:
     LDA #$ff
     STA dice_values, y
+    STA dice_kept, y
     INY
     CPY #6
     BNE loop
@@ -112,18 +113,21 @@ skip:
     ;get the value on the selected die and store it to temp
     LDX pointed_to_die
     LDA dice_values, x 
+    CMP #6
+    BEQ skip            ;6 here means the die is already selected
     STA temp
 
-    ;find the first 0 in kept_dice, where we will store the value
+    ;find the first $ff in dice_kept, where we will store the value
     LDY #255             ;iterator, will roll over to 0 
 loop:
     INY
-    LDA kept_dice, y 
+    LDA dice_kept, y 
+    CMP #$ff
     BNE loop
 
-    ;store value at kept_dice, y
+    ;store value at dice_kept, y
     LDA temp
-    STA kept_dice, y 
+    STA dice_kept, y 
 
     ;set starting address for draw_die
     LDA #$20
@@ -134,14 +138,15 @@ loop:
     ;draw an X on the die we selected
     LDA #6               ;6 is the index for the X'ed out die
     STA draw_die_number
+    STA dice_values, x   ;store 6 to dice_values so we know the die is X'ed out 
     LDA #1
     STA need_draw_die
     JSR wait_frame
     
     ;draw the die in the text box
-    ; Y still contains the index of kept_dice we're working with,
+    ; Y still contains the index of dice_kept we're working with,
     ; use that to figure out starting address for draw_die
-    LDA kept_dice, y 
+    LDA dice_kept, y 
     STA draw_die_number
     LDA #$21
     STA paddr +1
@@ -151,7 +156,8 @@ loop:
     STA paddr
 
     LDA #1
-    STA need_draw_die    
+    STA need_draw_die
+skip:
     RTS
 .endproc
 

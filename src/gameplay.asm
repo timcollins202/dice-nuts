@@ -229,38 +229,70 @@ skip:
 
 
 ;*****************************************************************
-; Add the value in A to the score
+; Add a value to the running score
+;   Inputs: A = the number to add
+;           X = the index of the digit to add it to
 ;*****************************************************************
-; .proc add_score
-;     CLC
-;     ADC score           ; See Cruise, p.162
-;     STA score
-;     CMP #99
-;     BCC skip
+.proc add_running_score
+    CLC
+    ADC running_score , x   ;Add A to the selected digit
+    STA running_score, x 
 
-;     SEC                 ; The first byte has exceeded 99, so overflow
-;     SBC #100
-;     STA score
-;     INC score + 1
-;     LDA score + 1
-;     CMP #99
-;     BCC skip
+check_overflow:
+    CMP #10
+    BCC done                ;If result < 10, no overflow.
 
-;     SEC                 ; The 2nd byte has exceeded 99, so overflow
-;     SBC #100
-;     STA score + 1
-;     INC score + 2
-;     LDA score + 2
-;     CMP #99
-;     BCC skip
-;     SEC                 ; If the 3rd byte exceeds 99, adjust and discard the overflow
-;     SBC #100
-;     STA score + 2
+    ;Handle overflow
+    SBC #10
+    STA running_score, x    ;Subract 10 from result and store it
 
-; skip:
-;     ; TODO: load appropriate number tiles for score into vram buffer
-;     ;  then set need_horiz_update
-;     ; do this in another subroutine
+    ;Propagate carry to next highest digit
+    INX
+    LDA #1
+    JMP add_running_score   ;Recursively add score to next digit
 
-;     RTS
-; .endproc
+done:
+    RTS
+.endproc
+
+;*****************************************************************
+; Add running_score to score
+;*****************************************************************
+.proc add_running_score_to_score
+    LDX #0                  ;digit index
+add_digit:
+    CLC
+    LDA running_score, x 
+    ADC score, x
+    STA score, x 
+
+    ;Check for overflow
+    CMP #10
+    BCC next_digit          ;If result < 10, no overflow.
+
+    ;Handle overflow
+    SBC #10
+    STA score, x
+
+    ;Propagate carry to next highest digit
+    INX
+    CPX #6                  ;Have we processed all 6 digits?
+    BCS done                ;If so, we're done
+
+    ;Add the carried 1 to the next digit
+    LDA #1
+    CLC
+    ADC score, x 
+    STA score, x 
+
+    JMP add_digit
+
+    ;Check whether we've processed all 6 digits and continue adding if not
+next_digit:
+    INX             
+    CPX #6
+    BCC add_digit
+
+done:
+    RTS
+.endproc

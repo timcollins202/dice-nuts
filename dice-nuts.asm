@@ -51,7 +51,7 @@ INES_SRAM   = 0 ; 1 = battery backed SRAM at $6000-7FFF
     gamestate:          .res 1      ;0-title/intro screen 1-rolling dice 2-selecting dice 3-scoring dice 4-game over
     pointed_to_die:     .res 1      ;Stores which die the selector is on
     draw_die_number:    .res 1      ;Number that draw_die needs to put on the die
-    score:              .res 6      ;The player's score, one byte per digit
+    score:              .res 6      ;The player's score, one byte per digit. Lowest is 10s.
     running_score:      .res 6      ;Running score while selecting dice
 
 .segment "OAM"

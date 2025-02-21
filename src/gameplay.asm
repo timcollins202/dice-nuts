@@ -1,5 +1,4 @@
 .segment "CODE"
-
 ;*****************************************************************
 ; Set gamestate
 ;*****************************************************************
@@ -71,6 +70,7 @@ loop:
     LDA #$ff
     STA dice_values, y
     STA dice_kept, y
+    STA dice_counters, y
     INY
     CPY #6
     BNE loop
@@ -121,6 +121,8 @@ skip:
     LDY #255             ;iterator, will roll over to 0 
 loop:
     INY
+    CPY #6
+    BEQ skip            ;make sure we don't search past dice_kept's max size
     LDA dice_kept, y 
     CMP #$ff
     BNE loop
@@ -163,48 +165,102 @@ skip:
 
 
 ;*****************************************************************
-; Score selected dice
+; Score selected dice dynamically as they are selected
 ;*****************************************************************
-.proc score_dice
+.proc calculate_score
+    ;Clear out dice_counts
+    LDA #0
+    STA dice_counts 
+    STA dice_counts + 1
+    STA dice_counts + 2
+    STA dice_counts + 3
+    STA dice_counts + 4
+    STA dice_counts + 5
 
+    ;Count occurrences of each die value in dice_kept and update dice_counters.
+    ;Each byte of dice_counters contains the count of kept instances of each value, 1-6.
+    LDY #0
+count_loop:
+    LDA dice_kept, y 
+    CMP #$ff            ;ignore unused slots
+    BEQ next_die
+    TAX
+    INC dice_counts, x  ;increment the count of that
 
+next_die:
+    INY
+    CPY #6              ;max of 6 kept dice
+    BNE count_loop
+
+    ;Scoring logic
+    LDX #0
+score_loop:
+    LDA dice_counts, x 
+    CMP #3
+    BCC check_singles   ;if less than 3, check for single dice scoring
+
+    ;Three of a kind scoring
+    TXA
+    
+
+check_singles:
+    ;If the die face is 1 or 5, score single dice
+    TXA
+    CMP #0              ;are we looking at a 1?
+    BNE check_five
+
+    ;add 100 to temp score
+    LDA #100
+    JSR add_temp_score          ;TODO: this does not exist yet, write it!
+    JMP skip
+
+check_five:
+    CMP #4              ;are we looking at a 5?
+    BNE skip
+    LDA #50
+    JSR add_temp_score
+
+skip:
+    INX
+    CPX #6
+    BNE score_loop
+    RTS    
 .endproc
 
 
 ;*****************************************************************
 ; Add the value in A to the score
 ;*****************************************************************
-.proc add_score
-    CLC
-    ADC score           ; See Cruise, p.162
-    STA score
-    CMP #99
-    BCC skip
+; .proc add_score
+;     CLC
+;     ADC score           ; See Cruise, p.162
+;     STA score
+;     CMP #99
+;     BCC skip
 
-    SEC                 ; The first byte has exceeded 99, so overflow
-    SBC #100
-    STA score
-    INC score + 1
-    LDA score + 1
-    CMP #99
-    BCC skip
+;     SEC                 ; The first byte has exceeded 99, so overflow
+;     SBC #100
+;     STA score
+;     INC score + 1
+;     LDA score + 1
+;     CMP #99
+;     BCC skip
 
-    SEC                 ; The 2nd byte has exceeded 99, so overflow
-    SBC #100
-    STA score + 1
-    INC score + 2
-    LDA score + 2
-    CMP #99
-    BCC skip
-    SEC                 ; If the 3rd byte exceeds 99, adjust and discard the overflow
-    SBC #100
-    STA score + 2
+;     SEC                 ; The 2nd byte has exceeded 99, so overflow
+;     SBC #100
+;     STA score + 1
+;     INC score + 2
+;     LDA score + 2
+;     CMP #99
+;     BCC skip
+;     SEC                 ; If the 3rd byte exceeds 99, adjust and discard the overflow
+;     SBC #100
+;     STA score + 2
 
-skip:
-    ; load score bytes into vram buffer
-    
+; skip:
+;     ; TODO: load appropriate number tiles for score into vram buffer
+;     ;  then set need_horiz_update
+;     ; do this in another subroutine
 
-    LDA #1               ;set flag to update score on screen
-    STA need_horiz_update
-    RTS
-.endproc
+;     RTS
+; .endproc

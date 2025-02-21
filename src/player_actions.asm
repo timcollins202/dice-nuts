@@ -76,7 +76,7 @@ not_pressing_a:
     LDA gamepad
     AND #PAD_B
     BEQ not_pressing_b
-        ;we are pressing B. Nothing to do here yet.
+        ;we are pressing B. TODO: undo the selection of the previous die
         
 not_pressing_b:
     LDA gamepad

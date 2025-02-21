@@ -47,12 +47,12 @@ INES_SRAM   = 0 ; 1 = battery backed SRAM at $6000-7FFF
     dice_kept:          .res 6      ;Dice in hand to be scored
     dice_timers:        .res 6      ;Dice rolling animation timers
     dice_delay:         .res 6      ;Dice animation frame delay counters
-    dice_counters:      .res 6      ;Counts of kept dice for score calculation
+    dice_counts:        .res 6      ;Counts of kept dice for score calculation
     gamestate:          .res 1      ;0-title/intro screen 1-rolling dice 2-selecting dice 3-scoring dice 4-game over
     pointed_to_die:     .res 1      ;Stores which die the selector is on
     draw_die_number:    .res 1      ;Number that draw_die needs to put on the die
-    score:              .res 3      ;The player's score, 0-99 per byte
-    score_temp:         .res 3      ;Temp score bytes used while scoring hand pre-submission
+    score:              .res 6      ;The player's score, one byte per digit
+    running_score:      .res 6      ;Running score while selecting dice
 
 .segment "OAM"
     oam:                .res 256    ;OAM sprite data

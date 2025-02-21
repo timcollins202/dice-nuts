@@ -70,7 +70,7 @@ loop:
     LDA #$ff
     STA dice_values, y
     STA dice_kept, y
-    STA dice_counters, y
+    STA dice_counts, y
     INY
     CPY #6
     BNE loop
@@ -211,14 +211,14 @@ check_singles:
 
     ;add 100 to temp score
     LDA #100
-    JSR add_temp_score          ;TODO: this does not exist yet, write it!
+    ;JSR add_temp_score          ;TODO: this does not exist yet, write it!
     JMP skip
 
 check_five:
     CMP #4              ;are we looking at a 5?
     BNE skip
     LDA #50
-    JSR add_temp_score
+    ;JSR add_temp_score
 
 skip:
     INX

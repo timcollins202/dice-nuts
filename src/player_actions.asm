@@ -71,6 +71,7 @@ not_pressing_up:
         CMP #2
         BNE not_pressing_a
             JSR select_die
+            JSR calculate_running_score
 
 not_pressing_a:
     LDA gamepad

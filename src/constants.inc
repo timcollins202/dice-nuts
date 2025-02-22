@@ -15,9 +15,9 @@ QUADS_FOUND             = temp + 9
 ;*****************************************************************
 ; Running score digit indices
 ;*****************************************************************
-RUNNING_SCORE_10s   = #0
-RUNNING_SCORE_100s  = #1
-RUNNING_SCORE_1000s = #2
+RUNNING_SCORE_10s   = 0
+RUNNING_SCORE_100s  = 1
+RUNNING_SCORE_1000s = 2
 
 ;*****************************************************************
 ; OAM sprite definitions

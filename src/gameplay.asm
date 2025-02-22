@@ -179,8 +179,9 @@ skip:
     STA SKIP_STRAIGHT
     STA PAIRS_FOUND
     STA TRIPLES_FOUND
+    STA QUADS_FOUND
 
-    ;Count occurrences of each die value in dice_kept and update dice_counters.
+    ;Count occurrences of each die value in dice_kept and update dice_counts.
     ;Each byte of dice_counters contains the count of kept instances of each value, 1-6.
     LDY #0
 count_loop:
@@ -199,217 +200,203 @@ next_die:
     LDX #0
 score_loop:
     LDA dice_counts, x 
-    CMP #1              ;if it isn't a 1, we can skip checking for straights later
-    BEQ +:
-        PHA
-        LDA #1
-        STA SKIP_STRAIGHT
-        PLA
+
+    ;If it isn't a 1, we can rule out a straight
+    CMP #1              
+    BEQ :+
+        INC SKIP_STRAIGHT
     :
-    
+
+    ;If it is a 1, check for single die scoring
+    BNE :++
+        ;If the face value is 1 or 5, score single die
+        ;X contains the face value - 1
+        ;Check for a 1
+        CPX #0 
+        BNE :+
+            ;Add 100 to running score
+            LDA #1
+            STA ADD_RUNNING_SCORE_VALUE 
+            LDA #RUNNING_SCORE_10s
+            STA ADD_RUNNING_SCORE_DIGIT
+            JSR add_running_score
+            JMP continue
+        :
+        ;Check for a 5
+        CPX #4
+        BNE :+
+            ;Add 50 to running score
+            LDA #5
+            STA ADD_RUNNING_SCORE_VALUE 
+            LDA #RUNNING_SCORE_10s
+            STA ADD_RUNNING_SCORE_DIGIT
+            JSR add_running_score
+            JMP continue
+        :
+    :
+
     ;Check for a pair
     CMP #2
-    BEQ +:
+    BNE :+
         INC PAIRS_FOUND ;Pairs aren't scored unless there are 3, or with a quad
+        JMP continue
     :
 
+    ;Check for a triple
     CMP #3
-    BCC check_singles   ;if less than 3, check for single dice scoring
+    BNE :+
+        INC TRIPLES_FOUND   ;Trips score differently for 1 or 2 of them, handled later
+        JMP continue
+    :
+
+    ;Check for a quad
+    CMP #4
+    BNE :+
+        INC QUADS_FOUND
+        JMP continue
+    :
+
+    ;Check for a quint
+    CMP #5
+    BNE :+
+        ;Add 2,000 to running score
+        LDA #2
+        STA ADD_RUNNING_SCORE_VALUE
+        LDA #RUNNING_SCORE_1000s
+        STA ADD_RUNNING_SCORE_DIGIT
+        JSR add_running_score
+        JMP continue
+    :
+
+    ;Check for a sextet
+    CMP #6
+    BNE :+
+        ;Add 3,000 to running score
+        LDA #3
+        STA ADD_RUNNING_SCORE_VALUE
+        LDA #RUNNING_SCORE_1000s
+        STA ADD_RUNNING_SCORE_DIGIT
+        JSR add_running_score
+        RTS               ;no further scoring is possible, GTFO
+    :
+
+continue:
+    INX
+    CPX #6
+    BNE score_loop
+
+    ;Check flags and score accordingly
+    ;Check for straight
+    LDA SKIP_STRAIGHT     ;If SKIP_STRAIGHT was not set in loop, we have a straight
+    BNE :+
+        JSR add_1500_running_score
+        RTS               ;no other scoring is possible, GTFO
+    :
+
+    ;Check for three pairs
+    LDA PAIRS_FOUND
+    CMP #3
+    BNE :+
+        JSR add_1500_running_score
+        RTS               ;no other scoring is possible, GTFO        
+    :
+
+    ;Check for quads
+    LDA QUADS_FOUND
+    BEQ :++
+        ;If we have a quad, do we also have a pair?
+        LDA PAIRS_FOUND
+        CMP #1
+        BNE :+
+            ;Score a quad and a pair
+            JSR add_1500_running_score
+            RTS           ;no other scoring is possible, GTFO           
+        :
+        ;Score just a quad
+        LDA #1
+        STA ADD_RUNNING_SCORE_VALUE
+        LDA #RUNNING_SCORE_1000s
+        STA ADD_RUNNING_SCORE_DIGIT
+        JSR add_running_score
+        RTS               ;no other scoring is possible, GTFO
+    :
 
     ;Check for triples
-    CMP #3              ;is it exactly 3?
-    BNE check_quads
-    INC TRIPLES_FOUND
-
-    ;Triples are worth face value * 100
-    STA ADD_RUNNING_SCORE_VALUE
-    LDA RUNNING_SCORE_100s
-    STA ADD_RUNNING_SCORE_DIGIT
-    JSR add_running_score
-    JMP check_singles    ;only singles are possible at this point
-
-check_quads:
-    ;Quads are always worth 1,000
-    CMP #4              ;is it exactly 4?
-    BNE check_quints
-    INC QUADS_FOUND
-
-    ;Check whether we have a pair as well
-    LDA PAIRS_FOUND
+    ;Check for a single triple first
+    LDA TRIPLES_FOUND
     CMP #1
-    BCC +:
-        ;We have a quad and a pair, worth 1,500
-        ;Add 1,000 to running score
-        LDA #1
+    BNE :+
+        ;Put the index of the 3 in dice_counts in A
+        JSR find_triple_index
+        ;Score that * 100 points
+        STA ADD_RUNNING_SCORE_VALUE
+        LDA #RUNNING_SCORE_100s
+        STA ADD_RUNNING_SCORE_DIGIT
+        JSR add_running_score
+    :
+    ;Check for two triples
+    CMP #2
+    BNE :+
+        ;Score 2,500 for two triples
+        ;Add 2,000 to running score
+        LDA #2
         STA ADD_RUNNING_SCORE_VALUE 
-        LDA RUNNING_SCORE_1000s
+        LDA #RUNNING_SCORE_1000s
         STA ADD_RUNNING_SCORE_DIGIT
         JSR add_running_score
         ;Add 500 to running score
         LDA #5
         STA ADD_RUNNING_SCORE_VALUE 
-        LDA RUNNING_SCORE_100s
+        LDA #RUNNING_SCORE_100s
         STA ADD_RUNNING_SCORE_DIGIT
         JSR add_running_score
-        RTS                    ;no other scoring is possible, GTFO
+    :
 
-    LDA #1
-    STA ADD_RUNNING_SCORE_VALUE
-    LDA RUNNING_SCORE_1000s
-    STA ADD_RUNNING_SCORE_DIGIT
-    JSR add_running_score
+    RTS
+.endproc
 
-check_quints:
-    ;Quints are always worth 2,000
-    CMP #5              ;is it exactly 5?
-    BNE check_sixes
-
-    LDA #2
-    STA ADD_RUNNING_SCORE_VALUE
-    LDA RUNNING_SCORE_1000s
-    STA ADD_RUNNING_SCORE_DIGIT
-    JSR add_running_score
-
-check_sixes:
-    ;Six of a number is always worth 3,000
-    CMP #6
-    BNE check_straight
-
-    LDA #3
-    STA ADD_RUNNING_SCORE_VALUE
-    LDA RUNNING_SCORE_1000s
-    STA ADD_RUNNING_SCORE_DIGIT
-    JSR add_running_score
-
-check_straight:
-    ;Check whether we can skip checking for a straight
-    LDA SKIP_STRAIGHT
-    CMP #1
-    BEQ check_three_pairs
-
-    ;Preserve Y on stack
-    TYA
-    PHA              
-
-    ;Loop over dice_kept checking for 1's.  If a non-1 is found, not a straight.
-    LDY #0
-straight_loop:
-    LDA dice_kept, y 
-    CMP #1              
-    BNE no_straight
-    INY 
-    CPY #6
-    BNE straight_loop
-
-    ;If we get here, we have a straight, worth 1,500.
+.proc add_1500_running_score
     ;Add 1,000 to running score
     LDA #1
     STA ADD_RUNNING_SCORE_VALUE 
-    LDA RUNNING_SCORE_1000s
+    LDA #RUNNING_SCORE_1000s
     STA ADD_RUNNING_SCORE_DIGIT
     JSR add_running_score
     ;Add 500 to running score
     LDA #5
     STA ADD_RUNNING_SCORE_VALUE 
-    LDA RUNNING_SCORE_100s
+    LDA #RUNNING_SCORE_100s
     STA ADD_RUNNING_SCORE_DIGIT
     JSR add_running_score
-    RTS                    ;no other scoring is possible, GTFO
-
-no_straight:
-    ;Set SKIP_STRAIGHT for future iterations
-    LDA #1
-    STA SKIP_STRAIGHT
-
-    ;Restore Y
-    PLA
-    TAY
-
-check_three_pairs:
-    ;Check whether 3 pairs have already been found
-    LDA PAIRS_FOUND
-    CMP #3
-    BNE :+
-        ;We have found 3 pairs, worth 1,500.
-        ;Add 1,000 to running score
-        LDA #1
-        STA ADD_RUNNING_SCORE_VALUE 
-        LDA RUNNING_SCORE_1000s
-        STA ADD_RUNNING_SCORE_DIGIT
-        JSR add_running_score
-        ;Add 500 to running score
-        LDA #5
-        STA ADD_RUNNING_SCORE_VALUE 
-        LDA RUNNING_SCORE_100s
-        STA ADD_RUNNING_SCORE_DIGIT
-        JSR add_running_score
-        RTS                    ;no other scoring is possible, GTFO
-    :
-
-    ;Preserve Y on stack   
-    TYA
-    PHA
-
-    ;Loop over dice_counts
-    LDY #0
-three_pairs_loop:
-    LDA dice_counts, y 
-    CMP #2
-    BNE not_a_pair  
-    INC PAIRS_FOUND
-
-not_a_pair:
-    INY
-    CPY #6
-    BNE three_pairs_loop
-
-    ;Restore Y from stack
-    PLA
-    TAY
-
-    ;Check whether 3 pairs have been found, if so, GTFO
-    LDA TRIPLES_FOUND
-    CMP #3
-    BNE +:
-        RTS 
-    :
-
-check_quad_and_pair:
-
-
-check_singles:
-    ;If the die face is 1 or 5, score single dice
-    CPX #0              ;are we looking at a 1?
-    BNE check_five
-
-    ;Add 100 to running score
-    LDA #1
-    STA ADD_RUNNING_SCORE_VALUE 
-    LDA RUNNING_SCORE_10s
-    STA ADD_RUNNING_SCORE_DIGIT
-    JSR add_running_score
-    JMP skip
-
-check_five:
-    CPX #4              ;are we looking at a 5?
-    BNE skip
-
-    ;Add 50 to running score
-    LDA #5
-    STA ADD_RUNNING_SCORE_VALUE 
-    LDA RUNNING_SCORE_10s
-    STA ADD_RUNNING_SCORE_DIGIT
-    JSR add_running_score
-
-skip:
-    INX
-    CPX #6
-    BEQ +:
-        JMP score_loop
-    :
     RTS
 .endproc
 
+.proc find_triple_index
+    ;find the index of the first 3 in dice_counts and return it in A   
+    TYA
+    PHA
+
+    LDY #0
+loop:
+    LDA dice_counts, y 
+    CMP #3
+    BEQ found
+    INY
+    CPY #6
+    BNE loop
+
+    LDA #$ff     ;if no 3 is found, return $ff.  this should never happen,
+    PLA          ;but we need to be able to tell if it did just in case, 
+    TAY          ;otherwise fails will always return 6.
+    RTS
+
+found:
+    STY temp
+    PLA
+    TAY
+    LDA temp
+    RTS
+.endproc
 
 ;*****************************************************************
 ; Add a value to the running score

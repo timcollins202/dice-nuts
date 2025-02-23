@@ -176,6 +176,12 @@ skip:
     STA dice_counts + 3
     STA dice_counts + 4
     STA dice_counts + 5
+    STA running_score
+    STA running_score + 1
+    STA running_score + 2
+    STA running_score + 3
+    STA running_score + 4
+    STA running_score + 5
     STA SKIP_STRAIGHT
     STA PAIRS_FOUND
     STA TRIPLES_FOUND
@@ -212,12 +218,12 @@ score_loop:
         ;If the face value is 1 or 5, score single die
         ;X contains the face value - 1
         ;Check for a 1
-        CPX #0 
+        CPX #0
         BNE :+
             ;Add 100 to running score
             LDA #1
             STA ADD_RUNNING_SCORE_VALUE 
-            LDA #RUNNING_SCORE_10s
+            LDA #RUNNING_SCORE_100s
             STA ADD_RUNNING_SCORE_DIGIT
             JSR add_running_score
             JMP continue
@@ -395,6 +401,8 @@ found:
     PLA
     TAY
     LDA temp
+    CLC
+    ADC #1       ;convert from index to face value
     RTS
 .endproc
 

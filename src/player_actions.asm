@@ -72,6 +72,7 @@ not_pressing_up:
         BNE not_pressing_a
             JSR select_die
             JSR calculate_running_score
+            JSR display_running_score
 
 not_pressing_a:
     LDA gamepad

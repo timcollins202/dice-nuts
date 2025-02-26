@@ -333,7 +333,7 @@ continue:
     CMP #1
     BNE :+
         ;Put the index of the 3 in dice_counts in A
-        JSR find_triple_index
+        JSR find_triple_value
         ;Score that * 100 points
         STA ADD_RUNNING_SCORE_VALUE
         LDA #RUNNING_SCORE_100s
@@ -377,8 +377,8 @@ continue:
     RTS
 .endproc
 
-.proc find_triple_index
-    ;find the index of the first 3 in dice_counts and return it in A   
+.proc find_triple_value
+    ;find the index of the first 3 in dice_count, add 1 and return it in A   
     TYA
     PHA
 

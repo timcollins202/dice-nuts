@@ -288,6 +288,9 @@ loop:
     ; Clear the number of bytes to write (first byte in buffer)
     LDA #0
     STA vram_buffer
+    
+    ;Clear need_horiz_update
+    STA need_horiz_update
     RTS
 .endproc
 
@@ -315,6 +318,43 @@ loop:
     INY
     CPY #25
     BNE loop
+
+    ;Set update flag for NMI
+    LDA #1
+    STA need_horiz_update
+
+    RTS
+.endproc
+
+;*****************************************************************
+; Display running score under kept dice           MAIN
+;*****************************************************************
+.proc display_running_score
+    ;Populate the tiles for the running score into VRAM buffer
+    LDA #7                  ;number of tiles we will write (includes trailing 0)
+    STA vram_buffer
+    LDA #$22                ;start writing at $2263 nametable address
+    STA vram_buffer + 1
+    LDA #$63
+    STA vram_buffer + 2
+
+    LDX #0                  ;index into vram_buffer
+    LDY #5                  ;index into running_score
+loop:
+    ;Load a byte of running_score, then get the tile number for that digit
+    ;Remember running_score stores the score backwards!
+    LDA running_score, y 
+    CLC 
+    ADC #$30                ;$30 is the 0 tile
+    STA vram_buffer + 3, x 
+    DEY
+    INX
+    CPY #0
+    BNE loop
+
+    ;Add the trailing 0 for ones place
+    LDA #$30
+    STA vram_buffer + 8
 
     ;Set update flag for NMI
     LDA #1
@@ -410,6 +450,7 @@ animate:
         LDA dice_values, y
         STA draw_die_number
         JMP set_address
+
 not_last_frame:
     LDA dice_roll           ;get whatever is in dice_roll
     STA draw_die_number
@@ -433,9 +474,12 @@ set_address:
     LDA #1
     STA need_draw_die    
     JSR wait_frame
+
 skip:
     INY
     CPY #6
     BNE loop
     RTS
 .endproc
+
+

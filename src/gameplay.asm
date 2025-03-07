@@ -416,7 +416,7 @@ found:
     ;Preserve X on stack
     TXA
     PHA
-
+    
 start:
     ;Load inputs
     LDA ADD_RUNNING_SCORE_VALUE

@@ -339,7 +339,7 @@ loop:
     STA vram_buffer + 2
 
     LDX #0                  ;index into vram_buffer
-    LDY #5                  ;index into running_score
+    LDY #6                  ;index into running_score
 loop:
     ;Load a byte of running_score, then get the tile number for that digit
     ;Remember running_score stores the score backwards!
@@ -354,7 +354,7 @@ loop:
 
     ;Add the trailing 0 for ones place
     LDA #$30
-    STA vram_buffer + 8
+    STA vram_buffer + 9
 
     ;Set update flag for NMI
     LDA #1
